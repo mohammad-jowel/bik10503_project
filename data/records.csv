@@ -1,2 +1,3 @@
+id,bookId,borrowerId,borrowDate,dueDate,returnDate
 REC001,B002,BR001,2026-06-01,2026-06-15,2026-06-05
 c92f976f,B002,BR001,2026-06-05,2026-06-19,null

@@ -16,6 +16,11 @@ public class CsvHelper {
     private static final String BORROWERS_FILE = DATA_DIR + "borrowers.csv";
     private static final String RECORDS_FILE = DATA_DIR + "records.csv";
 
+    // Header constants for CSV files
+    private static final String BOOKS_HEADER = "id,title,author,available";
+    private static final String BORROWERS_HEADER = "id,name";
+    private static final String RECORDS_HEADER = "id,bookId,borrowerId,borrowDate,dueDate,returnDate";
+
     // Ensures that the data directory exists
     public static void ensureDataDirExists() {
         File dir = new File(DATA_DIR);
@@ -28,6 +33,8 @@ public class CsvHelper {
         List<Book> books = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(BOOKS_FILE))) {
             String line;
+            // Skip header if it exists
+            String header = br.readLine();
             // Read file line by line
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
@@ -45,6 +52,8 @@ public class CsvHelper {
     // Saves the list of books to the CSV file
     public static void saveBooks(List<Book> books) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(BOOKS_FILE))) {
+            // Write header
+            pw.println(BOOKS_HEADER);
             // Write each book as a CSV line
             for (Book book : books) pw.println(book.toCsv());
         } catch (IOException e) {
@@ -57,6 +66,8 @@ public class CsvHelper {
         List<Borrower> borrowers = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(BORROWERS_FILE))) {
             String line;
+            // Skip header if it exists
+            String header = br.readLine();
             // Read file line by line
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
@@ -74,6 +85,8 @@ public class CsvHelper {
     // Saves the list of borrowers to the CSV file
     public static void saveBorrowers(List<Borrower> borrowers) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(BORROWERS_FILE))) {
+            // Write header
+            pw.println(BORROWERS_HEADER);
             // Write each borrower as a CSV line
             for (Borrower borrower : borrowers) pw.println(borrower.toCsv());
         } catch (IOException e) {
@@ -86,6 +99,8 @@ public class CsvHelper {
         List<Record> records = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(RECORDS_FILE))) {
             String line;
+            // Skip header if it exists
+            String header = br.readLine();
             // Read file line by line
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
@@ -103,6 +118,8 @@ public class CsvHelper {
     // Saves the list of borrowing records to the CSV file
     public static void saveRecords(List<Record> records) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(RECORDS_FILE))) {
+            // Write header
+            pw.println(RECORDS_HEADER);
             // Write each record as a CSV line
             for (Record record : records) pw.println(record.toCsv());
         } catch (IOException e) {
