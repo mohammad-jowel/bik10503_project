@@ -8,7 +8,6 @@ import library.util.CsvHelper;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 // Orchestrates library operations and data persistence
 public class LibrarySystem {
@@ -26,12 +25,38 @@ public class LibrarySystem {
         this.records = CsvHelper.loadRecords();
     }
 
+    // Generates the next sequential ID based on a prefix and existing items
+    private String generateNextId(String prefix, List<? extends library.model.BaseEntity> entities) {
+        int maxId = 0;
+        for (library.model.BaseEntity entity : entities) {
+            String id = entity.getId();
+            if (id != null && id.startsWith(prefix)) {
+                try {
+                    int num = Integer.parseInt(id.substring(prefix.length()));
+                    if (num > maxId) maxId = num;
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+        return String.format("%s%03d", prefix, maxId + 1);
+    }
+
     // Adds a new book to the collection
-    public void addBook(String id, String title, String author) {
+    public boolean addBook(String id, String title, String author) {
+        // If id is empty or null, generate it
+        if (id == null || id.trim().isEmpty()) {
+            id = generateNextId("B", books);
+        }
+
+        final String finalId = id;
+        // Check if book ID already exists
+        if (books.stream().anyMatch(b -> b.getId().equals(finalId))) {
+            return false;
+        }
         // Create new book object (available by default)
-        books.add(new Book(id, title, author, true));
+        books.add(new Book(finalId, title, author, true));
         // Persist updated book list
         CsvHelper.saveBooks(books);
+        return true;
     }
 
     // Removes a book by its ID
@@ -49,11 +74,22 @@ public class LibrarySystem {
     }
 
     // Registers a new borrower in the system
-    public void registerBorrower(String id, String name) {
+    public boolean registerBorrower(String id, String name) {
+        // If id is empty or null, generate it
+        if (id == null || id.trim().isEmpty()) {
+            id = generateNextId("BR", borrowers);
+        }
+
+        final String finalId = id;
+        // Check if borrower ID already exists
+        if (borrowers.stream().anyMatch(b -> b.getId().equals(finalId))) {
+            return false;
+        }
         // Create and add new borrower
-        borrowers.add(new Borrower(id, name));
+        borrowers.add(new Borrower(finalId, name));
         // Persist updated borrower list
         CsvHelper.saveBorrowers(borrowers);
+        return true;
     }
 
     // Retrieves all registered borrowers
@@ -81,8 +117,8 @@ public class LibrarySystem {
         Book book = bookOpt.get();
         book.setAvailable(false);
 
-        // Generate unique record ID and calculate dates
-        String recordId = UUID.randomUUID().toString().substring(0, 8);
+        // Generate sequential record ID
+        String recordId = generateNextId("REC", records);
         LocalDate borrowedDate = LocalDate.now();
         LocalDate dueDate = borrowedDate.plusDays(14); // 2-week loan period
 

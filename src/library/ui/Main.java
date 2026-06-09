@@ -15,6 +15,7 @@ public class Main {
         
         boolean running = true;
         while (running) {
+            
             // Display options and get user input
             printMenu();
             String choice = scanner.nextLine();
@@ -49,15 +50,18 @@ public class Main {
 
     // Collects input to add a new book
     private static void addBook() {
-        System.out.print("Enter Book ID: ");
+        System.out.print("Enter Book ID (leave blank for auto-generate): ");
         String id = scanner.nextLine();
         System.out.print("Enter Title: ");
         String title = scanner.nextLine();
         System.out.print("Enter Author: ");
         String author = scanner.nextLine();
-        // Delegate addition to the system
-        system.addBook(id, title, author);
-        System.out.println("Book added successfully.");
+        // Delegate addition to the system and check for success
+        if (system.addBook(id, title, author)) {
+            System.out.println("Book added successfully.");
+        } else {
+            System.out.println("Error: Book with ID " + id + " already exists.");
+        }
     }
 
     // Removes a book by ID
@@ -81,13 +85,16 @@ public class Main {
 
     // Registers a new borrower
     private static void registerBorrower() {
-        System.out.print("Enter Borrower ID: ");
+        System.out.print("Enter Borrower ID (leave blank for auto-generate): ");
         String id = scanner.nextLine();
         System.out.print("Enter Name: ");
         String name = scanner.nextLine();
-        // Delegate registration to the system
-        system.registerBorrower(id, name);
-        System.out.println("Borrower registered successfully.");
+        // Delegate registration to the system and check for success
+        if (system.registerBorrower(id, name)) {
+            System.out.println("Borrower registered successfully.");
+        } else {
+            System.out.println("Error: Borrower with ID " + id + " already exists.");
+        }
     }
 
     // Lists all registered borrowers
@@ -122,4 +129,3 @@ public class Main {
         system.getAllRecords().forEach(System.out::println);
     }
 }
-
